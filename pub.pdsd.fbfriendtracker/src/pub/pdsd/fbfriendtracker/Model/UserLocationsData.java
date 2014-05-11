@@ -9,12 +9,14 @@ public class UserLocationsData {
 		locations = new ArrayList<LocationData>();
 	}
 	
-	private String uid;
-	public String getUserId(){
-		return uid;
+	
+	private UserData user;
+	public UserData getUser() {
+		return user;
 	}
-	public void setUserId(String val){
-		uid = val;
+	
+	public void setUserData(String userID, String userName){
+		user = new UserData(userID, userName);
 	}
 	
 	private List<LocationData> locations;

@@ -1,19 +1,27 @@
 package pub.pdsd.fbfriendtracker;
 
 
+
 import java.util.List;
+
+
+
+
 
 
 import com.facebook.UiLifecycleHelper;
 
 
+
+
+
+
 import android.app.Activity;
 import android.content.Intent;
-
 import android.os.Bundle;
-
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import pub.pdsd.fbfriendtracker.R;
 import pub.pdsd.fbfriendtracker.Facebook.FacebookManager;
@@ -21,8 +29,12 @@ import pub.pdsd.fbfriendtracker.Facebook.FacebookOperationsDelegate;
 import pub.pdsd.fbfriendtracker.Facebook.Utils;
 import pub.pdsd.fbfriendtracker.Model.UserData;
 import pub.pdsd.fbfriendtracker.Model.UserLocationsData;
+import pub.pdsd.fbfriendtracker.Utils.AvatarFetcher;
+import pub.pdsd.fbfriendtracker.Utils.AvatarFetcherDelegate;
 
-public class MainActivity extends Activity implements FacebookOperationsDelegate, View.OnClickListener {
+public class MainActivity extends Activity 
+						  implements FacebookOperationsDelegate, View.OnClickListener,
+										AvatarFetcherDelegate	{
 
 	private final String TAG = "MainActivity";
 	
@@ -33,6 +45,7 @@ public class MainActivity extends Activity implements FacebookOperationsDelegate
 	Button		mBtnGetFriends;
 	Button		mBtnGetCheckins;
 	
+	ImageView	mImgView;
 	
 	UiLifecycleHelper uiHelper;
 	@Override
@@ -48,6 +61,8 @@ public class MainActivity extends Activity implements FacebookOperationsDelegate
 		mBtnLogOutFb.setOnClickListener(this);
 		mBtnGetFriends.setOnClickListener(this);
 		mBtnGetCheckins.setOnClickListener(this);
+		
+		mImgView = (ImageView)findViewById(R.id.imageView);
 		
 		mTxtStatus = (TextView)findViewById(R.id.txtLoginStat);
 
@@ -100,14 +115,37 @@ public class MainActivity extends Activity implements FacebookOperationsDelegate
 	}
 	
 	@Override
-	public void onFetchUsersFinishedCallback(List<UserData> friends,
-			boolean success) {
-		// TODO Auto-generated method stub
+	public void onFetchUsersFinishedCallback(List<UserData> friends, boolean success) {
 		
 	}
 	
+	UserData []users;
 	@Override
 	public void onGetFriendsCheckinsFinishedCallback(List<UserLocationsData> checkIns) {
+		//ArrayList<UserData> users = new ArrayList<UserData>();
 		
+		users = new UserData[checkIns.size()]; 
+		for(int i = 0; i < checkIns.size(); i++) {
+			users[i] = checkIns.get(i).getUser();
+		}
+		
+		AvatarFetcher imgDw = new AvatarFetcher(this);
+		imgDw.execute(users);
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
+	// AvatarFetcherDelegate implementation
+	
+	@Override
+	public void onSingleAvatarDwFinishedCallback(int idx) {
+		mImgView.setImageBitmap(users[idx].getAvatar());
+	}
+
+
+
+	@Override
+	public void onAvatarsDwFinishedCallback(int result) {
+
 	}
 }

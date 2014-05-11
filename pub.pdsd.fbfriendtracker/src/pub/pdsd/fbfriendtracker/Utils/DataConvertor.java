@@ -27,7 +27,8 @@ public class DataConvertor {
 		if(null != jsonObj){
 			try {
 				String userId = jsonObj.getString("id");
-				userData.setUserId(userId);
+				String userName = jsonObj.getString("name");
+				userData.setUserData(userId, userName);
 
 				if(jsonObj.has("locations")) {
 					JSONArray jsonDataArray = jsonObj.getJSONObject("locations").getJSONArray("data");

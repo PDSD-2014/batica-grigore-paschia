@@ -1,0 +1,9 @@
+package pub.pdsd.fbfriendtracker.Utils;
+
+import pub.pdsd.fbfriendtracker.Model.UserData;
+import android.os.AsyncTask;
+
+public class AvatarFetcher extends AsyncTask<UserData, Integer, Integer>{
+
+	
+}

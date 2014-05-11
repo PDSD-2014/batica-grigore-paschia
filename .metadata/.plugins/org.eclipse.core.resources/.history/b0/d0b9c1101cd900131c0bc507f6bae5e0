@@ -1,0 +1,67 @@
+package pub.pdsd.fbfriendtracker.Utils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import pub.pdsd.fbfriendtracker.Model.UserData;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.util.Log;
+
+public class AvatarFetcher extends AsyncTask<UserData, Integer, Void>{
+
+	public static final int DOWNLOAD_FAILED = -1;
+	public static final int DOWNLOAD_SUCCESS = 1;
+	
+	public static final String TAG = "AvatarFetcher"; 
+	
+	private AvatarFetcherDelegate delegate;
+	
+	public AvatarFetcher(AvatarFetcherDelegate delegate) {
+		this.delegate = delegate;
+	}
+	
+	@Override
+	protected Void doInBackground(UserData... params) {
+		
+		for(int i = 0; i < params.length; i++){
+			
+			if(params[i] != null && params[i].getProfilePictureUrl() != null) {
+				
+				try {
+					URL url = new URL(params[i].getProfilePictureUrl());
+					HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+					connection.setDoInput(true);
+					connection.connect();
+					InputStream input = connection.getInputStream();
+					Bitmap myBitmap = BitmapFactory.decodeStream(input);
+					params[i].setAvatar(myBitmap);
+					
+					this.publishProgress(i);
+					
+				} catch (MalformedURLException e) {
+					Log.e(TAG, String.format("error at picture %d : %s", i, e.getMessage()));
+					this.publishProgress(DOWNLOAD_FAILED);
+				} catch (IOException e) {
+					Log.e(TAG, String.format("error at picture %d : %s", i, e.getMessage()));
+					this.publishProgress(DOWNLOAD_FAILED);
+				}
+			}
+		}
+		return null;
+	}
+
+	@Override
+	protected void onProgressUpdate(Integer...a){
+		delegate.onSingleAvatarDwFinishedCallback(a[0]);
+    }
+
+	@Override
+    protected void onPostExecute() {
+		delegate.onAvatarsDwFinishedCallback(DOWNLOAD_SUCCESS);
+    }
+}

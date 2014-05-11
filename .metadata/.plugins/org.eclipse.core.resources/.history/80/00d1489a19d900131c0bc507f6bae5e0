@@ -1,0 +1,58 @@
+package pub.pdsd.fbfriendtracker.Utils;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import pub.pdsd.fbfriendtracker.Model.UserData;
+import android.os.AsyncTask;
+
+public class AvatarFetcher extends AsyncTask<UserData, Integer, Integer>{
+
+	public static final int DOWNLOAD_FAILED = -1;
+	public static final int DOWNLOAD_SUCCESS = 1;
+	
+	@Override
+	protected Integer doInBackground(UserData... params) {
+		
+		for(int i = 0; i < params.length; i++){
+			
+			if(params[i] != null && params[i].getProfilePictureUrl() != null) {
+				
+				try {
+					URL url = new URL(params[i].getProfilePictureUrl());
+					try {
+						HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				} catch (MalformedURLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+//				HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//				connection.setDoInput(true);
+//				connection.connect();
+//				InputStream input = connection.getInputStream();
+//				Bitmap myBitmap = BitmapFactory.decodeStream(input);
+//				return myBitmap;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	protected void onProgressUpdate(Integer...a){
+        
+    }
+
+	@Override
+    protected void onPostExecute(Integer result) {
+        
+    }
+}

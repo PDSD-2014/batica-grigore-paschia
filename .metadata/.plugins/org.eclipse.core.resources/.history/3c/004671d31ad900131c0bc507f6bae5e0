@@ -1,0 +1,13 @@
+package pub.pdsd.fbfriendtracker.Utils;
+
+public interface AvatarFetcherDelegate {
+	@Override
+	protected void onProgressUpdate(Integer...a){
+        
+    }
+
+	@Override
+    protected void onPostExecute(Integer result) {
+        
+    }
+}

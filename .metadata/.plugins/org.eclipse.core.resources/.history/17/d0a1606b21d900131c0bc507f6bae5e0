@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <TextView
+            android:id="@+id/txtLoginStat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Not logged in" />
+"
+
+        <Button
+            android:id="@+id/btnLoginFb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtLoginStat"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="10dp"
+            android:text="Log in fb" />
+
+        <Button
+            android:id="@+id/btnLogoutFb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/txtLoginStat"
+            android:layout_marginTop="10dp"
+            android:text="Log out fb" />
+
+        <Button
+            android:id="@+id/btnGetFriends"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btnLogoutFb"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:text="Get friends" />
+
+        <Button
+            android:id="@+id/btnGetCheckins"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btnGetFriends"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:text="Get checkins" />
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/btnGetCheckins"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:contentDescription="Your image will appear here" >
+        </ImageView>
+    </RelativeLayout>
+
+</LinearLayout>

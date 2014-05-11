@@ -1,0 +1,5 @@
+package pub.pdsd.fbfriendtracker.Utils;
+
+public interface AvatarFetcherDelegate {
+
+}

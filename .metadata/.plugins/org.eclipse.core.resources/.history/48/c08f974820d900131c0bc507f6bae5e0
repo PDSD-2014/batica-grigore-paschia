@@ -1,0 +1,119 @@
+package pub.pdsd.fbfriendtracker.Utils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import pub.pdsd.fbfriendtracker.Model.UserData;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.util.Log;
+
+public class AvatarFetcher extends AsyncTask<UserData, Integer, Void>{
+
+	public static final int DOWNLOAD_FAILED = -1;
+	public static final int DOWNLOAD_SUCCESS = 1;
+	
+	public static final String TAG = "AvatarFetcher"; 
+	
+	private AvatarFetcherDelegate delegate;
+	
+	public AvatarFetcher(AvatarFetcherDelegate delegate) {
+		this.delegate = delegate;
+	}
+	
+	@Override
+	protected Void doInBackground(UserData... params) {
+		
+		for(int i = 0; i < params.length; i++){
+			
+			if(params[i] != null && params[i].getProfilePictureUrl() != null) {
+				
+//				try {
+//					URL url = new URL(params[i].getProfilePictureUrl());
+//					HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//					connection.setDoInput(true);
+//					connection.connect();
+//					InputStream input = connection.getInputStream();
+//					Bitmap myBitmap = BitmapFactory.decodeStream(input);
+//					params[i].setAvatar(myBitmap);
+//					
+//					this.publishProgress(i);
+//					
+//				} catch (MalformedURLException e) {
+//					Log.e(TAG, String.format("error at picture %d : %s", i, e.getMessage()));
+//					this.publishProgress(DOWNLOAD_FAILED);
+//				} catch (IOException e) {
+//					Log.e(TAG, String.format("error at picture %d : %s", i, e.getMessage()));
+//					this.publishProgress(DOWNLOAD_FAILED);
+//				}
+				params[i].setAvatar(myBitmap);				
+				this.publishProgress(i);
+			}
+		}
+		return null;
+	}
+
+	private Bitmap downloadBitmap(String url) {
+        
+        final DefaultHttpClient client = new DefaultHttpClient();
+
+       
+        final HttpGet getRequest = new HttpGet(url);
+        try {
+
+            HttpResponse response = client.execute(getRequest);
+
+            final int statusCode = response.getStatusLine().getStatusCode();
+
+            if (statusCode != HttpStatus.SC_OK) {
+                Log.w("ImageDownloader", "Error " + statusCode + 
+                        " while retrieving bitmap from " + url);
+                return null;
+
+            }
+
+            final HttpEntity entity = response.getEntity();
+            if (entity != null) {
+                InputStream inputStream = null;
+                try {
+                    
+                    inputStream = entity.getContent();
+                    
+                    final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+
+                    return bitmap;
+                } finally {
+                    if (inputStream != null) {
+                        inputStream.close();
+                    }
+                    entity.consumeContent();
+                }
+            }
+        } catch (Exception e) {
+            getRequest.abort();
+        } 
+
+        return null;
+    }
+
+	
+	@Override
+	protected void onProgressUpdate(Integer...a){
+		delegate.onSingleAvatarDwFinishedCallback(a[0]);
+    }
+
+	@Override
+    protected void onPostExecute(Void res) {
+		delegate.onAvatarsDwFinishedCallback(DOWNLOAD_SUCCESS);
+    }
+}

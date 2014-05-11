@@ -168,7 +168,7 @@ public class FacebookManager {
 		
 		Bundle params = new Bundle();	      
 	    params.putString("access_token", session.getAccessToken());
-	    params.putString("fields", "locations");
+	    params.putString("fields", "locations,name");
 		
 		Request req = new Request(session, String.format("%s/friends", me.getUid()), params, HttpMethod.GET);
 		req.setCallback( new Request.Callback() {

@@ -1,0 +1,39 @@
+package pub.pdsd.fbfriendtracker.Utils;
+
+import pub.pdsd.fbfriendtracker.Model.UserData;
+import android.os.AsyncTask;
+
+public class AvatarFetcher extends AsyncTask<UserData, Integer, Integer>{
+
+	public static final int DOWNLOAD_FAILED = -1;
+	public static final int DOWNLOAD_SUCCESS = 1;
+	
+	@Override
+	protected Integer doInBackground(UserData... params) {
+		
+		for(int i = 0; i < params.length; i++){
+			
+			if(params[i] != null && params[i].getProfilePictureUrl() != null) {
+				
+//				URL url = new URL(imageUrl);
+//				HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//				connection.setDoInput(true);
+//				connection.connect();
+//				InputStream input = connection.getInputStream();
+//				Bitmap myBitmap = BitmapFactory.decodeStream(input);
+//				return myBitmap;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	protected void onProgressUpdate(Integer...a){
+        
+    }
+
+	@Override
+    protected void onPostExecute(Integer result) {
+        
+    }
+}
