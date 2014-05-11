@@ -1,0 +1,3 @@
+INDEX VERSION 1.126+F:\hacking-stuff\Facultate\pdsd\proiect\.metadata\.plugins\org.eclipse.jdt.core
+1520215117.index
+3065416851.index
