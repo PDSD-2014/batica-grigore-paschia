@@ -2,37 +2,39 @@ package pub.pdsd.fbfriendtracker;
 
 
 
+import java.util.ArrayList;
 import java.util.List;
 
-
-
-
-
-
-import com.facebook.UiLifecycleHelper;
-
-
-
-
-
-
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
-import pub.pdsd.fbfriendtracker.R;
 import pub.pdsd.fbfriendtracker.Facebook.FacebookManager;
 import pub.pdsd.fbfriendtracker.Facebook.FacebookOperationsDelegate;
 import pub.pdsd.fbfriendtracker.Facebook.Utils;
+import pub.pdsd.fbfriendtracker.Model.LocationData;
 import pub.pdsd.fbfriendtracker.Model.UserData;
 import pub.pdsd.fbfriendtracker.Model.UserLocationsData;
 import pub.pdsd.fbfriendtracker.Utils.AvatarFetcher;
 import pub.pdsd.fbfriendtracker.Utils.AvatarFetcherDelegate;
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-public class MainActivity extends Activity 
+import com.facebook.UiLifecycleHelper;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+public class MainActivity extends FragmentActivity 
 						  implements FacebookOperationsDelegate, View.OnClickListener,
 										AvatarFetcherDelegate	{
 
@@ -51,24 +53,25 @@ public class MainActivity extends Activity
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		//setContentView(R.layout.activity_main);
+		setContentView(R.layout.map_layout);
 
-		mBtnLogInFb = (Button)findViewById(R.id.btnLoginFb);
-		mBtnLogOutFb = (Button)findViewById(R.id.btnLogoutFb);
-		mBtnGetFriends = (Button)findViewById(R.id.btnGetFriends);
-		mBtnGetCheckins = (Button)findViewById(R.id.btnGetCheckins);
-		mBtnLogInFb.setOnClickListener(this);
-		mBtnLogOutFb.setOnClickListener(this);
-		mBtnGetFriends.setOnClickListener(this);
-		mBtnGetCheckins.setOnClickListener(this);
-		
-		mImgView = (ImageView)findViewById(R.id.imageView);
-		
-		mTxtStatus = (TextView)findViewById(R.id.txtLoginStat);
+//		mBtnLogInFb = (Button)findViewById(R.id.btnLoginFb);
+//		mBtnLogOutFb = (Button)findViewById(R.id.btnLogoutFb);
+//		mBtnGetFriends = (Button)findViewById(R.id.btnGetFriends);
+//		mBtnGetCheckins = (Button)findViewById(R.id.btnGetCheckins);
+//		mBtnLogInFb.setOnClickListener(this);
+//		mBtnLogOutFb.setOnClickListener(this);
+//		mBtnGetFriends.setOnClickListener(this);
+//		mBtnGetCheckins.setOnClickListener(this);
+//		
+//		mImgView = (ImageView)findViewById(R.id.imageView);
+//		
+//		mTxtStatus = (TextView)findViewById(R.id.txtLoginStat);
 
 		FacebookManager.Init(this, this);
 		Utils.PrintHash(this);
-		
+		FacebookManager.Login();
 	}
 
 	
@@ -104,13 +107,14 @@ public class MainActivity extends Activity
 	@Override
 	public void onLoggedInFinishedCallback(UserData me, boolean success) {
 		if(success){
-			mTxtStatus.setText(String.format("User: %s", me.getName()));			
+			//mTxtStatus.setText(String.format("User: %s", me.getName()));
+			FacebookManager.GetFriendsCheckins();
 		} else {
-			mTxtStatus.setText("Not logged in");
+			//mTxtStatus.setText("Not logged in");
 		}
 		
-		mBtnLogInFb.setEnabled(!success);
-		mBtnLogOutFb.setEnabled(success);
+		//mBtnLogInFb.setEnabled(!success);
+		//mBtnLogOutFb.setEnabled(success);
 
 	}
 	
@@ -120,13 +124,17 @@ public class MainActivity extends Activity
 	}
 	
 	UserData []users;
+	List<UserLocationsData> mCheckIns;
 	@Override
 	public void onGetFriendsCheckinsFinishedCallback(List<UserLocationsData> checkIns) {
 		//ArrayList<UserData> users = new ArrayList<UserData>();
-		
+		mCheckIns = checkIns;
 		users = new UserData[checkIns.size()]; 
+		
 		for(int i = 0; i < checkIns.size(); i++) {
 			users[i] = checkIns.get(i).getUser();
+			
+			
 		}
 		
 		AvatarFetcher imgDw = new AvatarFetcher(this);
@@ -139,7 +147,26 @@ public class MainActivity extends Activity
 	
 	@Override
 	public void onSingleAvatarDwFinishedCallback(int idx) {
-		mImgView.setImageBitmap(users[idx].getAvatar());
+		//mImgView.setImageBitmap(users[idx].getAvatar());
+		
+
+		MapFragment frag = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+		GoogleMap map = frag.getMap();
+		
+		
+		if (mCheckIns.get(idx).getLocations().size() != 0)
+		{
+			LocationData userLocation = mCheckIns.get(idx).getLocations().get(0);
+			
+			double lat = userLocation.getLatitude();
+			double lng = userLocation.getLongitude();
+			LatLng position = new LatLng(lat, lng);//44.4453545719, 26.055957504);
+			Bitmap icon = users[idx].getAvatar();//(Bitmap) BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+			Marker firstMarker = map.addMarker(new MarkerOptions().position(position).title(userLocation.getPlaceName()).icon(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(icon, 120, 120, false))));
+					
+		}
+		
+		//map.moveCamera( CameraUpdateFactory.newLatLngZoom(position , 14.0f)); 
 	}
 
 
