@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical" 
+    android:background="@drawable/back">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -13,16 +14,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Not logged in" />
-"
 
-        <Button
-            android:id="@+id/btnLoginFb"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/txtLoginStat"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="10dp"
-            android:text="Log in fb" />
 
         <Button
             android:id="@+id/btnLogoutFb"
@@ -33,34 +25,62 @@
             android:layout_marginTop="10dp"
             android:text="Log out fb" />
 
+        
+        <Button
+            android:id="@+id/btnLoginFb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/btnLogoutFb"
+            android:layout_alignBottom="@+id/btnLogoutFb"
+            android:layout_alignRight="@+id/txtLoginStat"
+            android:text="Log in fb" />
+
         <Button
             android:id="@+id/btnGetFriends"
-            android:layout_width="200dp"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/btnLogoutFb"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"
+            android:layout_alignLeft="@+id/btnLoginFb"
+            android:layout_below="@+id/btnLoginFb"
+            android:layout_marginTop="20dp"
             android:text="Get friends" />
+        
+        
 
         <Button
             android:id="@+id/btnGetCheckins"
-            android:layout_width="200dp"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/btnGetFriends"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"
+            android:layout_alignBaseline="@+id/btnGetFriends"
+            android:layout_alignBottom="@+id/btnGetFriends"
+            android:layout_alignParentRight="true"
             android:text="Get checkins" />
+<ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+         android:layout_below="@+id/btnGetFriends"
+        android:layout_marginBottom="25dp"
+        android:scrollbars="none" >
 
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/btnGetCheckins"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"
-            android:contentDescription="Your image will appear here" >
-        </ImageView>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TableLayout
+                android:id="@+id/tableFriends"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignRight="@+id/btnGetFriends"
+                android:layout_alignTop="@+id/btnGetFriends"
+                android:layout_marginRight="17dp"
+                android:layout_marginTop="113dp" >
+            </TableLayout>
+        </LinearLayout>
+    </ScrollView>
+     
         
     </RelativeLayout>
+
+    
 
 </LinearLayout>
