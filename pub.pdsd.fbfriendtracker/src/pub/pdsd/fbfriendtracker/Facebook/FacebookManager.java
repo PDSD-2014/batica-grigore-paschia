@@ -10,6 +10,8 @@ import org.json.JSONObject;
 
 import pub.pdsd.fbfriendtracker.Model.UserData;
 import pub.pdsd.fbfriendtracker.Model.UserLocationsData;
+import pub.pdsd.fbfriendtracker.Utils.AvatarFetcher;
+import pub.pdsd.fbfriendtracker.Utils.AvatarFetcherDelegate;
 import pub.pdsd.fbfriendtracker.Utils.DataConvertor;
 import android.app.Activity;
 import android.content.Intent;
@@ -28,6 +30,7 @@ public class FacebookManager {
 
 	/* Used to announce the caller*/
 	private static FacebookOperationsDelegate sDelegate;
+	private static AvatarFetcherDelegate avDelegate;
 	private static Activity sActivity;
 	private static boolean sbIsEnabled = false;
 
@@ -38,7 +41,7 @@ public class FacebookManager {
 	public static void Init(Activity activity,FacebookOperationsDelegate delegate){
 		sDelegate = delegate;
 		sActivity = activity;
-
+		avDelegate = null;
 		sbIsEnabled = true;
 	}
 
@@ -145,15 +148,28 @@ public class FacebookManager {
 				} else {
 					List<UserData> friends = new ArrayList<UserData>();					
 					for(GraphUser user : users){
-						friends.add(new UserData(user.getId(), user.getName()));
+						UserData newUserData = new UserData(user.getId(), user.getName());
+						
+						friends.add(newUserData);
+						
 					}
+					//AvatarFetcher imgDw = new AvatarFetcher(avDelegate);
+					//avDelegate.onAvatarsDwFinishedCallback(1);
+//					UserData[] friendsAvatar = new UserData[friends.size()]; 
+//					for(int i = 0; i < friends.size(); i++) {
+//						friendsAvatar[i] = friends.get(i);
+//						
+//						
+//					}
+//					imgDw.execute (friendsAvatar);
+					//avDelegate.onAvatarsDwFinishedCallback(1);
 					Log.d(TAG, "friends fetched:SUCCESS");
 					sDelegate.onFetchUsersFinishedCallback(friends, true);
 					
 				}
 			}
 		});
-		
+		//req.executeAndWait();
 		req.executeAsync();
 	}
 	
@@ -199,7 +215,7 @@ public class FacebookManager {
 				sDelegate.onGetFriendsCheckinsFinishedCallback(usersWithCheckins);
 			}
 		});
-		
+	
 		req.executeAsync();
 
 	}

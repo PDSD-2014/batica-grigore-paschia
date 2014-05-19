@@ -38,6 +38,7 @@ import android.widget.TextView;
 import com.facebook.UiLifecycleHelper;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -56,29 +57,27 @@ public class MainActivity extends FragmentActivity
 	Button		mBtnGetFriends;
 	Button		mBtnGetCheckins;
 	TableLayout	mLstFriends;
-	
+	TableLayout	mLstAvatars;
 	ImageView	mImgView;
 	
 	UiLifecycleHelper uiHelper;
+	
+	boolean avatarFetched = false;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-	//	setContentView(R.layout.map_layout);
 
 		mBtnLogInFb = (Button)findViewById(R.id.btnLoginFb);
 		mBtnLogOutFb = (Button)findViewById(R.id.btnLogoutFb);
 		mBtnGetFriends = (Button)findViewById(R.id.btnGetFriends);
 		mBtnGetCheckins = (Button)findViewById(R.id.btnGetCheckins);
 		mLstFriends = (TableLayout)findViewById(R.id.tableFriends);
-		
+	
 		mBtnLogInFb.setOnClickListener(this);
 		mBtnLogOutFb.setOnClickListener(this);
 		mBtnGetFriends.setOnClickListener(this);
 		mBtnGetCheckins.setOnClickListener(this);
-	//	mLstFriends.setVisibility(View.INVISIBLE);
-		
-	//mImgView = (ImageView)findViewById(R.id.imageView);
 		
 		mTxtStatus = (TextView)findViewById(R.id.txtLoginStat);
 
@@ -86,7 +85,6 @@ public class MainActivity extends FragmentActivity
 		Utils.PrintHash(this);
 		mBtnGetFriends.setClickable(false);
 		mBtnGetCheckins.setClickable(false);
-		//FacebookManager.Login();
 	}
 
 	
@@ -95,21 +93,16 @@ public class MainActivity extends FragmentActivity
 	public void onClick(View v) {
 		switch(v.getId()){
 		case R.id.btnLoginFb:
-			Log.d ("PDSD", "loginFb tapped");
 			FacebookManager.Login();
-			//mBtnGetFriends.setClickable(true);
 			break;
 		case R.id.btnLogoutFb:
-			Log.d ("PDSD", "logoutFb tapped");
 			FacebookManager.Logout();
 			break;
 		case R.id.btnGetFriends:
-			Log.d ("PDSD", "fetch Friends tapped");
-		//	mBtnGetCheckins.setVisibility(View.INVISIBLE);
+			mLstFriends.removeAllViews();
 			FacebookManager.FetchFriends();
 			break;
 		case R.id.btnGetCheckins:
-			Log.d ("PDSD", "getCheckins tapped");
 			FacebookManager.GetFriendsCheckins();
 			break;
 		default:
@@ -129,7 +122,6 @@ public class MainActivity extends FragmentActivity
 	public void onLoggedInFinishedCallback(UserData me, boolean success) {
 		if(success){
 			mTxtStatus.setText(String.format("User: %s", me.getName()));
-			//FacebookManager.GetFriendsCheckins();
 			mBtnGetFriends.setClickable(true);
 			mBtnGetCheckins.setClickable(true);
 		} else {
@@ -137,73 +129,26 @@ public class MainActivity extends FragmentActivity
 			mBtnGetFriends.setClickable(false);
 			mBtnGetCheckins.setClickable(false);
 		}
-		
-		//mBtnLogInFb.setEnabled(!success);
-		//mBtnLogOutFb.setEnabled(success);
 
 	}
-	
+	UserData []users;
 	@Override
 	public void onFetchUsersFinishedCallback(List<UserData> friends, boolean success) {
-		if (success)
-		{
-		Log.d ("odsd", "success getting bfriends");
-		//mLstFriends.setVisibility(View.VISIBLE);
-		int listLength = friends.size();
-		Log.d ("odsd", "success getting bfriends length " + listLength);
-		TableRow row;
-		//Item[] iconArray = serv.getIcons();
-		//TableLayout table = (TableLayout) myView.findViewById(R.id.table1);
-		 for (int current = 0; current < listLength; current++)
-	        {
-	            // Create a TableRow and give it an ID
-	            TableRow tr = new TableRow(this);
-	            tr.setId(100+current);
-	            //new LayoutParams(
-             //   LayoutParams.FILL_PARENT,
-           //     LayoutParams.WRAP_CONTENT)); 
-	            tr.setLayoutParams( new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)); 
-
-	            // Create a TextView to house the name of the province
-	            TextView labelTV = new TextView(this);
-	            labelTV.setId(200+current);
-	            labelTV.setText(friends.get(current).getName());
-	            labelTV.setTextColor(Color.BLACK);
-	            labelTV.setLayoutParams(new LayoutParams(
-	                    LayoutParams.WRAP_CONTENT,
-	                    LayoutParams.WRAP_CONTENT));
-	            tr.addView(labelTV);
-
-	            // Create a TextView to house the value of the after-tax income
-	    Log.d("PDSD","Add"); 
-
-	            // Add the TableRow to the TableLayout
-	            mLstFriends.addView(tr, new TableLayout.LayoutParams(
-	                    LayoutParams.FILL_PARENT,
-	                    LayoutParams.WRAP_CONTENT));
-	        
-	
-
-	        }
-		    //ImageView imageicon = (ImageView) v.findViewById(R.id.myImg);
-		  //  imageicon.setOnClickListener(new OnClickListener() {
-		    //    public void onClick(View v) {
-		            //Do some stuff
-		     //   }
-		   // });
-		   // Drawable drawicon = getResources().getDrawable(icon);
-		    //imageicon.setBackgroundDrawable(drawicon);
-		   
 		
+			int listLength = friends.size();
+			AvatarFetcher imgDw = new AvatarFetcher(this);
+			users = new UserData[listLength]; 
+			for(int i = 0; i < listLength; i++) {
+				users[i] = friends.get(i);
+			}
 		
-		}
+			imgDw.execute (users);
 	}
 	
-	UserData []users;
+	
 	List<UserLocationsData> mCheckIns;
 	@Override
 	public void onGetFriendsCheckinsFinishedCallback(List<UserLocationsData> checkIns) {
-		//ArrayList<UserData> users = new ArrayList<UserData>();
 		mCheckIns = checkIns;
 		users = new UserData[checkIns.size()]; 
 		
@@ -223,32 +168,34 @@ public class MainActivity extends FragmentActivity
 	
 	@Override
 	public void onSingleAvatarDwFinishedCallback(int idx) {
-		//mImgView.setImageBitmap(users[idx].getAvatar());
-		
-
-		MapFragment frag = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
-		GoogleMap map = frag.getMap();
-		
-		
-		if (mCheckIns.get(idx).getLocations().size() != 0)
-		{
-			LocationData userLocation = mCheckIns.get(idx).getLocations().get(0);
-			
-			double lat = userLocation.getLatitude();
-			double lng = userLocation.getLongitude();
-			LatLng position = new LatLng(lat, lng);//44.4453545719, 26.055957504);
-			Bitmap icon = users[idx].getAvatar();//(Bitmap) BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
-			Marker firstMarker = map.addMarker(new MarkerOptions().position(position).title(userLocation.getPlaceName()).icon(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(icon, 120, 120, false))));
-					
-		}
-		
-		//map.moveCamera( CameraUpdateFactory.newLatLngZoom(position , 14.0f)); 
+		  TableRow tr = new  TableRow(getApplicationContext());
+          
+          tr.setLayoutParams( new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)); 
+          tr.setBackgroundColor( Color.WHITE);
+          
+          ImageView avatar = new ImageView(getApplicationContext());
+          if (users[idx] != null)
+          {
+        	  Log.d("pdsd", "users idx is not null" + idx);
+        	  avatar.setImageBitmap(users[idx].getAvatar());
+        	  TextView friendName = new TextView(getApplicationContext());
+              
+              friendName.setText(users[idx].getName());
+              friendName.setTextColor(Color.BLACK);
+              friendName.setTextScaleX(2);
+              friendName.setWidth(600);
+              friendName.setHeight(100);
+          	  
+              tr.addView(avatar);
+          	  tr.addView(friendName);
+              mLstFriends.addView(tr);
+          }
 	}
 
 
 
 	@Override
 	public void onAvatarsDwFinishedCallback(int result) {
-
+		avatarFetched = true;
 	}
 }
